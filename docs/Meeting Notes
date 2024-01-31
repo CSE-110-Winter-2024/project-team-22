@@ -10,6 +10,6 @@ Jan 28th:
 Jan 30th:
 
 
-- 
+-  implement todo list with a queue (FIFO), item at the top of the list is MIT and first thing that was added.
 -
 -
