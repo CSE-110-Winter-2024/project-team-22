@@ -23,6 +23,16 @@ public class SimpleGoalRepository implements GoalRepository {
     }
 
     @Override
+    public Subject<List<Goal>> findAllCompleted() {
+        return dataSource.getCompletedGoalsSubject();
+    }
+
+    @Override
+    public Subject<List<Goal>> findAllUncompleted() {
+        return dataSource.getUncompletedGoalsSubject();
+    }
+
+    @Override
     public void save(Goal goal) {
         dataSource.putGoal(goal);
     }
@@ -37,6 +47,8 @@ public class SimpleGoalRepository implements GoalRepository {
         dataSource.removeGoal(id);
     }
 
+    // Only calling this when adding a new Goal (has never
+    // been inside the db)
     @Override
     public void append(Goal goal) {
         dataSource.putGoal(
@@ -47,7 +59,16 @@ public class SimpleGoalRepository implements GoalRepository {
     @Override
     public void prepend(Goal goal) {
         // Shift all the existing cards up by one.
-        dataSource.shiftSortOrders(0, dataSource.getMaxSortOrder(), 1);
+        // We don't care about sort order in congregated "goals" list.
+        // dataSource.shiftSortOrders(0, dataSource.getMaxSortOrder(), 1);
+
+        // we only care about sort order in completed or uncompleted list.
+        if (goal.isCompleted()) {
+            dataSource.shiftSortOrdersCompleted(0, dataSource.getMaxSortOrder(), 1);
+        } else {
+            dataSource.shiftSortOrdersUncompleted(0, dataSource.getMaxSortOrder(), 1);
+        }
+
         // Then insert the new card before the first one.
         dataSource.putGoal(
                 goal.withSortOrder(dataSource.getMinSortOrder() -1)

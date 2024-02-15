@@ -21,11 +21,23 @@ public class InMemoryDataSource {
     private int minSortOrder = Integer.MAX_VALUE;
     private int maxSortOrder = Integer.MIN_VALUE;
 
+    // NOTE: We don't care about sort order in goals
     private final Map<Integer, Goal> goals
             = new HashMap<>();
+
+    Map<Integer, Goal> completedGoals
+            = new HashMap<>();
+    Map<Integer, Goal> uncompletedGoals
+            = new HashMap<>();
+
     private final Map<Integer, MutableSubject<Goal>> goalSubjects
             = new HashMap<>();
     private final MutableSubject<List<Goal>> allGoalsSubject
+            = new SimpleSubject<>();
+
+    private final MutableSubject<List<Goal>> completedGoalsSubject
+            = new SimpleSubject<>();
+    private final MutableSubject<List<Goal>> uncompletedGoalsSubject
             = new SimpleSubject<>();
 
     public InMemoryDataSource() {
@@ -47,6 +59,14 @@ public class InMemoryDataSource {
         return List.copyOf(goals.values());
     }
 
+    public List<Goal> getCompletedGoals() {
+        return List.copyOf(completedGoals.values());
+    }
+
+    public List<Goal> getUncompletedGoals() {
+        return List.copyOf(uncompletedGoals.values());
+    }
+
     public Goal getGoal(int id) {
         return goals.get(id);
     }
@@ -64,6 +84,9 @@ public class InMemoryDataSource {
         return allGoalsSubject;
     }
 
+    public Subject<List<Goal>> getCompletedGoalsSubject() { return completedGoalsSubject;}
+    public Subject<List<Goal>> getUncompletedGoalsSubject() { return uncompletedGoalsSubject;}
+
     public int getMinSortOrder() {
         return minSortOrder;
     }
@@ -73,7 +96,7 @@ public class InMemoryDataSource {
     }
 
     public void putGoal(Goal task) {
-        var fixedTask = preInsert(task);
+        /* var fixedTask = preInsert(task);
 
         goals.put(fixedTask.id(), fixedTask);
         postInsert();
@@ -82,10 +105,35 @@ public class InMemoryDataSource {
         if (goalSubjects.containsKey(fixedTask.id())) {
             goalSubjects.get(fixedTask.id()).setValue(fixedTask);
         }
+
         allGoalsSubject.setValue(getGoals());
+         */
+
+        var fixedTask = preInsert(task);
+
+        goals.put(fixedTask.id(), fixedTask);
+
+        if (fixedTask.isCompleted()) {
+            completedGoals.put(fixedTask.id(), fixedTask);
+        } else {
+            uncompletedGoals.put(fixedTask.id(), fixedTask);
+        }
+
+        postInsert();
+        assertSortOrderConstraints();
+
+        if (goalSubjects.containsKey(fixedTask.id())) {
+            goalSubjects.get(fixedTask.id()).setValue(fixedTask);
+        }
+
+        allGoalsSubject.setValue(getGoals());
+        completedGoalsSubject.setValue(getCompletedGoals());
+        uncompletedGoalsSubject.setValue(getUncompletedGoals());
+
     }
 
     public void putGoals(List<Goal> tasks) {
+        /*
         var fixedTasks = tasks.stream()
                 .map(this::preInsert)
                 .collect(Collectors.toList());
@@ -99,7 +147,37 @@ public class InMemoryDataSource {
                 goalSubjects.get(task.id()).setValue(task);
             }
         });
+
         allGoalsSubject.setValue(getGoals());
+
+         */
+
+        var fixedTasks = tasks.stream()
+                .map(this::preInsert)
+                .collect(Collectors.toList());
+
+        fixedTasks.forEach(task -> {
+            goals.put(task.id(), task);
+
+            if (task.isCompleted()) {
+                completedGoals.put(task.id(), task);
+            } else {
+                uncompletedGoals.put(task.id(), task);
+            }
+        });
+
+        postInsert();
+        assertSortOrderConstraints();
+
+        fixedTasks.forEach(task -> {
+            if (goalSubjects.containsKey(task.id())) {
+                goalSubjects.get(task.id()).setValue(task);
+            }
+        });
+
+        allGoalsSubject.setValue(getGoals());
+        completedGoalsSubject.setValue(getCompletedGoals());
+        uncompletedGoalsSubject.setValue(getUncompletedGoals());
     }
 
     public void removeGoal(int id) {
@@ -107,12 +185,22 @@ public class InMemoryDataSource {
         var sortOrder = task.sortOrder();
 
         goals.remove(id);
+
+        if (task.isCompleted()) {
+            completedGoals.remove(id);
+        } else {
+            uncompletedGoals.remove(id);
+        }
+
         shiftSortOrders(sortOrder, maxSortOrder, -1);
 
         if (goalSubjects.containsKey(id)) {
             goalSubjects.get(id).setValue(null);
         }
+
         allGoalsSubject.setValue(getGoals());
+        completedGoalsSubject.setValue(getCompletedGoals());
+        uncompletedGoalsSubject.setValue(getUncompletedGoals());
     }
 
     public void shiftSortOrders(int from, int to, int by) {
@@ -123,6 +211,27 @@ public class InMemoryDataSource {
 
         putGoals(tasks);
     }
+
+    // reset sort order amongst lists
+    public void shiftSortOrdersCompleted(int from, int to, int by) {
+        var tasks = completedGoals.values().stream()
+                .filter(task -> task.sortOrder() >= from && task.sortOrder() <= to)
+                .map(task -> task.withSortOrder(task.sortOrder() + by))
+                .collect(Collectors.toList());
+
+        putGoals(tasks);
+    }
+
+    // reset sort order between lists
+    public void shiftSortOrdersUncompleted(int from, int to, int by) {
+        var tasks = uncompletedGoals.values().stream()
+                .filter(task -> task.sortOrder() >= from && task.sortOrder() <= to)
+                .map(task -> task.withSortOrder(task.sortOrder() + by))
+                .collect(Collectors.toList());
+
+        putGoals(tasks);
+    }
+
 
     /**
      * Private utility method to maintain state of the fake DB: ensures that new
