@@ -59,6 +59,26 @@ public class RoomGoalRepository implements GoalRepository {
     }
 
     @Override
+    public Subject<Goal> findCompleted(int id) {
+        return null;
+    }
+
+    @Override
+    public Subject<Goal> findUncompleted(int id) {
+        return null;
+    }
+
+    @Override
+    public Subject<List<Goal>> findAllCompleted() {
+        return null;
+    }
+
+    @Override
+    public Subject<List<Goal>> findAllUncompleted() {
+        return null;
+    }
+
+    @Override
     public void remove(int id){
         flashcardDao.delete(id);
     }

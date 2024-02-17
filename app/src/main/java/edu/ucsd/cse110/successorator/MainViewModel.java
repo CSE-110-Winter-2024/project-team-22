@@ -27,6 +27,11 @@ public class MainViewModel extends ViewModel {
     private final MutableSubject<Boolean> isShowingFront;
     private final MutableSubject<String> displayedText;
 
+
+    private final MutableSubject<List<Goal>> completedGoals;
+    private final MutableSubject<List<Goal>> uncompletedGoals;
+
+
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
                     MainViewModel.class,
@@ -45,17 +50,43 @@ public class MainViewModel extends ViewModel {
         this.isShowingFront = new SimpleSubject<>();
         this.displayedText = new SimpleSubject<>();
 
+        this.completedGoals = new SimpleSubject<>();
+        this.uncompletedGoals = new SimpleSubject<>();
+
         // Initialize...
         isShowingFront.setValue(true);
 
         // When the list of cards changes (or is first loaded), reset the ordering.
+        /*
         goalRepository.findAll().observe(cards -> {
             if (cards == null) return; // not ready yet, ignore
 
             var newOrderedCards = cards.stream()
                     .sorted(Comparator.comparingInt(Goal::sortOrder))
                     .collect(Collectors.toList());
+
             orderedCards.setValue(newOrderedCards);
+        });
+         */
+
+        goalRepository.findAllCompleted().observe(goals -> {
+            if (goals == null) return; // not ready yet, ignore
+
+            var newCompletedGoals = goals.stream()
+                    .sorted(Comparator.comparingInt(Goal::sortOrder))
+                    .collect(Collectors.toList());
+
+            completedGoals.setValue(newCompletedGoals);
+        });
+
+        goalRepository.findAllUncompleted().observe(goals -> {
+            if (goals == null) return; // not ready yet, ignore
+
+            var newUncompletedGoals = goals.stream()
+                    .sorted(Comparator.comparingInt(Goal::sortOrder))
+                    .collect(Collectors.toList());
+
+            uncompletedGoals.setValue(newUncompletedGoals);
         });
 
         // When the ordering changes, update the top card.
@@ -94,17 +125,14 @@ public class MainViewModel extends ViewModel {
         return orderedCards;
     }
 
+    public Subject<List<Goal>> getCompletedGoals() { return completedGoals;}
+    public Subject<List<Goal>> getUncompletedGoals() { return uncompletedGoals;}
+
     public void flipTopCard() {
         var isShowingFront = this.isShowingFront.getValue();
         if (isShowingFront == null) return;
         this.isShowingFront.setValue(!isShowingFront);
     }
-
-
-
-
-
-
 
     public void append(Goal card) {
         goalRepository.append(card);
@@ -116,5 +144,18 @@ public class MainViewModel extends ViewModel {
 
     public void remove (int id){
         goalRepository.remove(id);
+    }
+
+    public Subject<Goal> getGoal(int id) {
+        Subject<Goal> goalSubject = goalRepository.findUncompleted(id);
+        if (goalSubject == null) {
+            goalSubject = goalRepository.findCompleted(id);
+        }
+
+        if (goalSubject == null) {
+            return null;
+        } else {
+            return goalSubject;
+        }
     }
 }

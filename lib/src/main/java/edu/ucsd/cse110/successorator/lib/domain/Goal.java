@@ -9,13 +9,13 @@ import java.util.Objects;
 public class Goal implements Serializable {
     private final @Nullable Integer id;
     private final @NonNull String text;
-    private final boolean goalStatus;
+    private boolean goalStatus;
     private final int sortOrder;
 
     public Goal(@Nullable Integer id, @NonNull String text, boolean goalStatus, int sortOrder) {
         this.id = id;
         this.text = text;
-        this.goalStatus = false;
+        this.goalStatus = goalStatus;
         this.sortOrder = sortOrder;
     }
 
@@ -28,6 +28,7 @@ public class Goal implements Serializable {
     }
 
     public boolean goalStatus(){ return goalStatus;}
+    public void setGoalStatus(boolean status){ this.goalStatus = status;}
 
 
     public int sortOrder() {

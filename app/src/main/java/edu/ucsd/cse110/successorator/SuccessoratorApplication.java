@@ -19,11 +19,12 @@ public class SuccessoratorApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        // Old
-//         this.dataSource = InMemoryDataSource.fromDefault();
-//         this.goalRepository = new SimpleGoalRepository(dataSource);
+        // For testing only
+        this.dataSource = InMemoryDataSource.fromDefault();
+        this.goalRepository = new SimpleGoalRepository(dataSource);
 
-//         New
+        // database implementation
+        /*
         var database = Room.databaseBuilder(
                         getApplicationContext(),
                         SECardsDatabase.class,
@@ -44,6 +45,7 @@ public class SuccessoratorApplication extends Application {
                     .putBoolean("isFirstRun", false)
                     .apply();
         }
+         */
     }
 
     public GoalRepository getFlashcardRepository() {

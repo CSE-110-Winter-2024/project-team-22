@@ -12,10 +12,12 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
+import edu.ucsd.cse110.successorator.lib.domain.Goal;
+import edu.ucsd.cse110.successorator.lib.util.Subject;
 
 public class ConfirmDeleteCardDialogFragment extends DialogFragment {
-    private static final String ARG_FLASHCARD_ID = "flashcard_id";
-    private int flashcardID;
+    private static final String ARG_GOAL_ID = "goal_id";
+    private int goalID;
 
     private MainViewModel activityModel;
 
@@ -24,10 +26,10 @@ public class ConfirmDeleteCardDialogFragment extends DialogFragment {
     }
 
     // make sure you return the right type;
-    public static ConfirmDeleteCardDialogFragment newInstance(int flashcardID){
+    public static ConfirmDeleteCardDialogFragment newInstance(int goalID){
         var fragment = new ConfirmDeleteCardDialogFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_FLASHCARD_ID, flashcardID);
+        args.putInt(ARG_GOAL_ID, goalID);
         fragment.setArguments(args);
         return fragment;
     }
@@ -37,7 +39,7 @@ public class ConfirmDeleteCardDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         // Retrieve the ID from the arguments (crash if no args)
-        this.flashcardID = requireArguments().getInt(ARG_FLASHCARD_ID);
+        this.goalID = requireArguments().getInt(ARG_GOAL_ID);
 
         var modelOwner = requireActivity();
         var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
@@ -57,7 +59,15 @@ public class ConfirmDeleteCardDialogFragment extends DialogFragment {
     }
 
     private void onPositiveButtonClick (DialogInterface dialog, int which){
-        activityModel.remove(flashcardID);
+        Subject<Goal> goalSubject = activityModel.getGoal(goalID);
+        Goal goal = goalSubject.getValue();
+
+        assert goal != null;
+        goal.setGoalStatus(!goal.goalStatus());
+        // lastly remove from list
+        activityModel.remove(goalID);
+        activityModel.prepend(goal);
+
         dialog.dismiss();
     }
 

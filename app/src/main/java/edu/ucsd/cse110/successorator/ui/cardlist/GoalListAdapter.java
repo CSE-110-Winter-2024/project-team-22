@@ -1,7 +1,7 @@
 package edu.ucsd.cse110.successorator.ui.cardlist;
 
-
 import android.content.Context;
+import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,9 +16,9 @@ import java.util.function.Consumer;
 import edu.ucsd.cse110.successorator.databinding.ListItemBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 
-public class CardListAdapter extends ArrayAdapter<Goal> {
+public class GoalListAdapter extends ArrayAdapter<Goal> {
     Consumer<Integer> onDeleteClick;
-    public CardListAdapter(Context context, List<Goal> goals, Consumer<Integer> onDeleteClick) {
+    public GoalListAdapter(Context context, List<Goal> goals, Consumer<Integer> onDeleteClick) {
         // This sets a bunch of stuff internally, which we can access
         // with getContext() and getItem() for example.
         //
@@ -31,9 +31,9 @@ public class CardListAdapter extends ArrayAdapter<Goal> {
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        // Get the flashcard for this position.
-        var flashcard = getItem(position);
-        assert flashcard != null;
+        // Get the goal for this position.
+        var goal = getItem(position);
+        // assert goal != null;
 
         // Check if a view is being reused...
         ListItemBinding binding;
@@ -46,15 +46,31 @@ public class CardListAdapter extends ArrayAdapter<Goal> {
             binding = ListItemBinding.inflate(layoutInflater, parent, false);
         }
 
-        // Populate the view with the flashcard's data.
-        binding.taskCompleted.setText(flashcard.text());
+        // Populate the view with the goal's data.
+        // binding.cardFrontText.setText(goal.text());
+
+        binding.taskCompleted.setText(goal.text());
+        if (goal.goalStatus()) {
+            binding.taskCompleted.setPaintFlags(binding.taskCompleted.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            binding.taskCompleted.setPaintFlags(binding.taskCompleted.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+        }
+
+        /*
+        String text = "Text with strikethrough";
+        SpannableString spannableString = new SpannableString(text);
+        spannableString.setSpan(new StrikethroughSpan(), 0, text.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textView.setText(spannableString);
+         */
 
 
-        //Bind the delete button to the callback.
+        // Bind the delete button to the callback.
+        // callback is performed when button is clicked
         binding.cardDeleteButton.setOnClickListener(v -> {
-            var id = flashcard.id();
-            assert id != null;
+            var id = goal.id();
+            // assert id != null;
             onDeleteClick.accept(id);
+
         });
 
         return binding.getRoot();
@@ -71,11 +87,11 @@ public class CardListAdapter extends ArrayAdapter<Goal> {
 
     @Override
     public long getItemId(int position) {
-        var flashcard = getItem(position);
-        assert flashcard != null;
+        var goal = getItem(position);
+        // assert goal != null;
 
-        var id = flashcard.id();
-        assert id != null;
+        var id = goal.id();
+        // assert id != null;
 
         return id;
     }
