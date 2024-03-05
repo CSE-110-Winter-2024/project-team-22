@@ -62,10 +62,10 @@ public class SimpleGoalRepository implements GoalRepository {
     }
 
     @Override
-    public List<Goal> remove(int id) {
+    public void remove(int id) {
         // remove from GoalList
         dataSource.removeFlashcard(id);
-        return syncLists();
+//        return syncLists();
 
         // prepend in GoalList, update sort order in process
         //dataSource.putFlashcard
@@ -73,7 +73,7 @@ public class SimpleGoalRepository implements GoalRepository {
     }
 
     @Override
-    public List<Goal> append(Goal goal) {
+    public void append(Goal goal) {
         // process in GoalList, simply call syncList
         List<Goal> listOfGoals = syncLists();
         int sortOrder = goals.getGoalSortOrder(goal, true);
@@ -93,11 +93,11 @@ public class SimpleGoalRepository implements GoalRepository {
 
         dataSource.putFlashcard(goal);
 
-        return syncLists();
+//        return syncLists();
     }
 
     @Override
-    public List<Goal> prepend(Goal goal) {
+    public void prepend(Goal goal) {
         // process in GoalList, simply call syncList
         List<Goal> listOfGoals = syncLists();
         int sortOrder = goals.getGoalSortOrder(goal, false);
@@ -116,11 +116,11 @@ public class SimpleGoalRepository implements GoalRepository {
         // Then insert the new card before the first one.
 
         dataSource.putFlashcard(goal);
-        return syncLists();
+//        return syncListssts();
     }
 
     @Override
-    public List<Goal> removeCompleted() {
+    public void removeCompleted() {
         List<Goal> goalsData = this.dataSource.getFlashcards();
         List<Goal> deletedData = new ArrayDeque<>();
 
@@ -131,6 +131,6 @@ public class SimpleGoalRepository implements GoalRepository {
             }
         });
 
-        return deletedData;
+//        return deletedData;
     }
 }

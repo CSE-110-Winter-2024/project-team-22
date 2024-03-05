@@ -12,7 +12,7 @@ import java.util.List;
 @Dao
 public interface GoalDao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Long insert(GoalEntity flashcard);
+    Long insert(GoalEntity goal);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     List<Long> insert(List<GoalEntity> goals);
@@ -22,6 +22,9 @@ public interface GoalDao{
 
     @Query("SELECT * FROM goals ORDER by sort_order")
     List<GoalEntity> findAll();
+
+    @Query("SELECT * FROM goals WHERE is_completed = true")
+    List<GoalEntity> findAllCompleted();
 
     @Query("SELECT * FROM goals where id =:id")
     LiveData<GoalEntity> findAsLiveData(int id);
@@ -64,6 +67,9 @@ public interface GoalDao{
 
     @Query("DELETE FROM goals WHERE id = :id")
     void delete(int id);
+
+    @Query("DELETE FROM goals WHERE is_completed = true")
+    void deleteCompleted();
 }
 
 

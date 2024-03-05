@@ -50,12 +50,7 @@ public class CardListFragment extends Fragment {
                 requireContext(),
                 List.of(),
                 goal -> {
-                    activityModel.remove(goal.id());
-                    goal = goal.withCompleted(!goal.isCompleted());
-                    activityModel.prepend(goal);
-
-                    // var newGoal = goal.withCompleted(!goal.isCompleted());
-                    // activityModel.save(newGoal);
+                    activityModel.toggleCompleted(goal);
                 },
                 goal -> {
                     var dialogFragment = ConfirmDeleteCardDialogFragment.newInstance(goal.id());

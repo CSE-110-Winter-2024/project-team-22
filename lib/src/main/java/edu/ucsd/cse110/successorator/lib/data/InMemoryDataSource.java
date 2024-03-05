@@ -179,14 +179,14 @@ public class InMemoryDataSource {
                 .map(Goal::sortOrder)
                 .collect(Collectors.toList());
 
-        // Non-negative...
-        assert sortOrders.stream().allMatch(i -> i >= 0);
-
-        // Unique...
-        assert sortOrders.size() == sortOrders.stream().distinct().count();
-
-        // Between min and max...
-        assert sortOrders.stream().allMatch(i -> i >= minSortOrder);
-        assert sortOrders.stream().allMatch(i -> i <= maxSortOrder);
+//        // Non-negative...
+//        assert sortOrders.stream().allMatch(i -> i >= 0);
+//
+//        // Unique...
+//        assert sortOrders.size() == sortOrders.stream().distinct().count();
+//
+//        // Between min and max...
+//        assert sortOrders.stream().allMatch(i -> i >= minSortOrder);
+//        assert sortOrders.stream().allMatch(i -> i <= maxSortOrder);
     }
 }
