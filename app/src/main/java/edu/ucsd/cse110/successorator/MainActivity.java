@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.action_bar_add_goal_views) {
             // change to add button
             // TODO: make swap button do somnething
-            var dialogFragment = CreateGoalDialogFragment.newInstance(date);
+            var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getSupportFragmentManager(), "CreateDialogFragment");
         }
 
