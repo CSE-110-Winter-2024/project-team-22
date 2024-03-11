@@ -19,15 +19,17 @@ import java.util.Date;
 import java.time.LocalDate;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
+import edu.ucsd.cse110.successorator.R;
 import edu.ucsd.cse110.successorator.databinding.FragmentExpandMoreViewsBinding;
 import edu.ucsd.cse110.successorator.databinding.FragmentGoalListBinding;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.SuccessDate;
+import edu.ucsd.cse110.successorator.ui.goallist.GoalListAdapter;
 
 public class ExpandViewsFragment extends Fragment {
     private FragmentExpandMoreViewsBinding view;
     private MainViewModel activityModel;
-    //private Date DisplayDate;
+
 
     ExpandViewsFragment(){
         // Required empty public constructor
@@ -46,18 +48,36 @@ public class ExpandViewsFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Initialize the ViewModel.
-        activityModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-
+        // Initialize the Model
+        var modelOwner = requireActivity();
+        var modelFactory = ViewModelProvider.Factory.from(MainViewModel.initializer);
+        var modelProvider = new ViewModelProvider(modelOwner, modelFactory);
+        this.activityModel = modelProvider.get(MainViewModel.class);
 
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        this.view = FragmentExpandMoreViewsBinding.inflate(inflater, container, false);
 
+        view = FragmentExpandMoreViewsBinding.inflate(inflater, container, false);
+        setupClickListeners();
         return view.getRoot();
+    }
+
+
+    private void setupClickListeners() {
+        view.todayViewLabel.setOnClickListener(v -> swapFragment(new TodayViewFragment()));
+        view.tomorrowViewLabel.setOnClickListener(v -> swapFragment(new TomorrowViewFragment()));
+        view.pendingViewLabel.setOnClickListener(v -> swapFragment(new PendingViewFragment()));
+        view.recurringViewLabel.setOnClickListener(v -> swapFragment(new RecurringViewFragment()));
+    }
+
+    private void swapFragment(Fragment fragment) {
+        getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .commit();
     }
 
 }

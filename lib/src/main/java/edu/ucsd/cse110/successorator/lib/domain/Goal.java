@@ -17,7 +17,6 @@ public class Goal implements Serializable {
 
     private String frequency;
 
-
     private LocalDate creationDate;
 
 

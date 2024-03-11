@@ -12,13 +12,13 @@
         android:layout_height="53dp"
         android:layout_gravity="center"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:text="No goals for the Day. Click the + at the upper right to enter your MIT."
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tomorrow_date" />
+        app:layout_constraintTop_toBottomOf="@+id/today_date" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_container"
@@ -26,24 +26,39 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/text_view_no_goals"
+        app:layout_constraintVertical_bias="1.0"
         tools:layout="@layout/fragment_goal_list" />
 
     <TextView
-        android:id="@+id/tomorrow_date"
-        android:layout_width="wrap_content"
+        android:id="@+id/today_label"
+        android:layout_width="80sp"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton_next"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:text="Today"
+        android:textSize="24sp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/today_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:text="date"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toStartOf="@+id/imageButton_next"
+        app:layout_constraintStart_toEndOf="@+id/today_label"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton

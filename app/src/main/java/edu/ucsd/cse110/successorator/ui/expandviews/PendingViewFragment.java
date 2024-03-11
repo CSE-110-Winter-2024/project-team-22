@@ -1,6 +1,4 @@
-
-package edu.ucsd.cse110.successorator.ui.goallist;
-
+package edu.ucsd.cse110.successorator.ui.expandviews;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,23 +15,25 @@ import java.util.List;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentGoalListBinding;
+import edu.ucsd.cse110.successorator.ui.goallist.GoalListAdapter;
+import edu.ucsd.cse110.successorator.ui.goallist.GoalListFragment;
 
-public class GoalListFragment extends Fragment {
+public class PendingViewFragment extends Fragment {
+
+
     private MainViewModel activityModel;
     private FragmentGoalListBinding view;
     private GoalListAdapter adapter;
 
-    public GoalListFragment() {
-        // Required empty public constructor
-    }
 
-    public static GoalListFragment newInstance() {
-        GoalListFragment fragment = new GoalListFragment();
+    public PendingViewFragment(){}
+
+    public static PendingViewFragment newInstance() {
+        PendingViewFragment fragment = new PendingViewFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,9 +65,8 @@ public class GoalListFragment extends Fragment {
         );
 
         // when goal list changes in ModelView, we update it
-        activityModel.getGoalsForToday().observe(goals -> {
+        activityModel.getGoals().observe(goals -> {
             if (goals == null) return;
-//            activityModel.updateDisplayedGoals();
             adapter.clear();
             adapter.addAll(new ArrayList<>(goals)); // remember the mutable copy here!
             adapter.notifyDataSetChanged();
@@ -92,4 +91,3 @@ public class GoalListFragment extends Fragment {
         return view.getRoot();
     }
 }
-

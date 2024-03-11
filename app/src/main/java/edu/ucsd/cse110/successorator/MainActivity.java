@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MainViewModel viewModel;
 
-    private boolean isShowingToday = true;
+    private boolean isShowingExpandViews = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
         // Show Current Day
         date = new Date();
         displayDate();
+        // show today label
+        displayLabel();
         // nextDay Button
         ImageButton next_day_button = (ImageButton)findViewById(R.id.imageButton_next);
         next_day_button.setOnClickListener(new View.OnClickListener() {
@@ -88,26 +90,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (itemId == R.id.action_bar_expand_more_views){
-            swapFragment();
+            showExpandViews();
 
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void swapFragment() {
-        if (!isShowingToday){
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, GoalListFragment.newInstance())
-                    .commit();
-        } else {
+    private void showExpandViews() {
+        if (!isShowingExpandViews){
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, ExpandViewsFragment.newInstance())
                     .commit();
+            isShowingExpandViews = true;
         }
-        isShowingToday = !isShowingToday;
+
+        isShowingExpandViews = false;
+
     }
 
 
@@ -131,8 +131,14 @@ public class MainActivity extends AppCompatActivity {
         Log.d("===============", date.toString());
 //        TextView textViewDate = findViewById(R.id.text_view_date);
         //viewModel.setDate(date);
-        TextView textViewDate = findViewById(R.id.tomorrow_date);
+        TextView textViewDate = findViewById(R.id.today_date);
+
         textViewDate.setText(currentDate);
+    }
+    private void displayLabel(){
+        TextView textViewLabel = findViewById(R.id.today_label);
+        textViewLabel.setText("Today");
+
     }
 
     private void removeAllCompleted() {

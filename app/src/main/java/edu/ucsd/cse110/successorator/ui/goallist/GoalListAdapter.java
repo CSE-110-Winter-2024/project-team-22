@@ -42,7 +42,6 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
     public View getView(int position, View convertView, ViewGroup parent) {
         // Get the goal for this position.
         var goal = getItem(position);
-
         assert goal != null;
 
         // Check if a view is being reused...
@@ -78,23 +77,4 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
         return binding.getRoot();
    }
 
-    // The below methods aren't strictly necessary, usually.
-    // But get in the habit of defining them because they never hurt
-    // (as long as you have IDs for each item) and sometimes you need them.
-
-    @Override
-    public boolean hasStableIds() {
-        return true;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        var flashcard = getItem(position);
-        assert flashcard != null;
-
-        var id = flashcard.id();
-        assert id != null;
-
-        return id;
-    }
 }

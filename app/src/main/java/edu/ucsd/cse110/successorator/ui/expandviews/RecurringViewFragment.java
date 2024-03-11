@@ -1,6 +1,4 @@
-
-package edu.ucsd.cse110.successorator.ui.goallist;
-
+package edu.ucsd.cse110.successorator.ui.expandviews;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,23 +15,22 @@ import java.util.List;
 
 import edu.ucsd.cse110.successorator.MainViewModel;
 import edu.ucsd.cse110.successorator.databinding.FragmentGoalListBinding;
+import edu.ucsd.cse110.successorator.ui.goallist.GoalListAdapter;
 
-public class GoalListFragment extends Fragment {
+
+public class RecurringViewFragment extends Fragment {
     private MainViewModel activityModel;
     private FragmentGoalListBinding view;
     private GoalListAdapter adapter;
 
-    public GoalListFragment() {
-        // Required empty public constructor
-    }
+    public RecurringViewFragment(){}
 
-    public static GoalListFragment newInstance() {
-        GoalListFragment fragment = new GoalListFragment();
+    public static RecurringViewFragment newInstance() {
+        RecurringViewFragment fragment = new RecurringViewFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
-
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,9 +48,9 @@ public class GoalListFragment extends Fragment {
                 goal -> { // onGoalClicked
                     // When goal is tapped, this is lambda function is called.
                     // NOTE: ConfirmDeleteCardDialogFragment is NOT called.
-                    activityModel.remove(goal.id());
+                    /*activityModel.remove(goal.id());
                     goal = goal.withCompleted(!goal.isCompleted());
-                    activityModel.prepend(goal);
+                    activityModel.prepend(goal);*/
 
                     // var newGoal = goal.withCompleted(!goal.isCompleted());
                     // activityModel.save(newGoal);
@@ -64,16 +61,13 @@ public class GoalListFragment extends Fragment {
                 }
         );
 
-        // when goal list changes in ModelView, we update it
-        activityModel.getGoalsForToday().observe(goals -> {
+        activityModel.getGoals().observe(goals -> {
             if (goals == null) return;
-//            activityModel.updateDisplayedGoals();
             adapter.clear();
             adapter.addAll(new ArrayList<>(goals)); // remember the mutable copy here!
             adapter.notifyDataSetChanged();
         });
     }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -92,4 +86,3 @@ public class GoalListFragment extends Fragment {
         return view.getRoot();
     }
 }
-
