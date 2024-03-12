@@ -18,10 +18,15 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import android.os.Bundle;
+import androidx.fragment.app.Fragment;
 
+import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
+import edu.ucsd.cse110.successorator.lib.domain.FilterGoals;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
 import edu.ucsd.cse110.successorator.lib.util.Subject;
@@ -29,29 +34,41 @@ import edu.ucsd.cse110.successorator.lib.util.MutableSubject;
 import edu.ucsd.cse110.successorator.lib.util.SimpleSubject;
 
 public class MainViewModel extends ViewModel {
-    // Domain state (true "Model" state)
     private final GoalRepository goalRepositoryDB;
-
-    // UI state
     private final MutableSubject<List<Goal>> goals;
     private final MutableSubject<Goal> goal;
     private final MutableSubject<Boolean> isCompleted;
-
     private final MutableSubject<Boolean> isEmpty;
-    private MutableSubject<List<Goal>> weeklyGoals;
-    private MutableSubject<List<Goal>> dailyGoals;
+
+
+    // One-time, daily, weekly, monthly, yearly
     private MutableSubject<List<Goal>> oneTimeGoals;
+    private MutableSubject<List<Goal>> dailyGoals;
+    private MutableSubject<List<Goal>> weeklyGoals;
     private MutableSubject<List<Goal>> monthlyGoals;
     private MutableSubject<List<Goal>> yearlyGoals;
+
+    // home, work, school or errands
+    private MutableSubject<List<Goal>> homeGoals;
+    private MutableSubject<List<Goal>> workGoals;
+    private MutableSubject<List<Goal>> schoolGoals;
+    private MutableSubject<List<Goal>> errandGoals;
+
+    // today, tomorrow, pending, recurring
     MutableSubject<List<Goal>> todayGoals = new SimpleSubject<>();
     MutableSubject<List<Goal>> tomorrowGoals = new SimpleSubject<>();
-
     MutableSubject<List<Goal>> pendingGoals = new SimpleSubject<>();
-
     MutableSubject<List<Goal>> recurringGoals = new SimpleSubject<>();
+
+    private final ArrayList<String> frequencies = new ArrayList<>(Arrays.asList("One Time", "Daily", "Weekly", "Monthly", "Yearly"));
+    private final ArrayList<String> contexts = new ArrayList<>(Arrays.asList("Home", "Work", "School", "Errands"));
+    private final ArrayList<String> dropdown = new ArrayList<>(Arrays.asList("Today", "Tomorrow", "Pending", "Recurring"));
     private Date currentDate;
 
-    private MutableSubject<String> label ;
+    // focus can be: Home, Work, School, Errands, All
+    private MutableSubject<String> focus;
+    // label can be: Today, Tomorrow, Pending, Recurring
+    private MutableSubject<String> label;
 
     public static final ViewModelInitializer<MainViewModel> initializer =
             new ViewModelInitializer<>(
@@ -69,30 +86,71 @@ public class MainViewModel extends ViewModel {
         this.goals = new SimpleSubject<>();
         this.goal = new SimpleSubject<>();
         this.currentDate = new Date();
+
         this.isCompleted = new SimpleSubject<>();
         this.isEmpty = new SimpleSubject<>();
         this.label = new SimpleSubject<>();
+        this.focus = new SimpleSubject<>();
         isEmpty.setValue(true);
-        label.setValue("Today");
-        this.weeklyGoals = new SimpleSubject<>();
+
+        // When we open the app, we start with this
+        this.label.setValue("Today");
+        this.focus.setValue("All");
+
         this.oneTimeGoals = new SimpleSubject<>();
         this.dailyGoals =  new SimpleSubject<>();
+        this.weeklyGoals = new SimpleSubject<>();
         this.monthlyGoals = new SimpleSubject<>();
         this.yearlyGoals = new SimpleSubject<>();
+
+        this.homeGoals = new SimpleSubject<>();
+        this.workGoals = new SimpleSubject<>();
+        this.schoolGoals = new SimpleSubject<>();
+        this.errandGoals = new SimpleSubject<>();
+
+        this.todayGoals = new SimpleSubject<>();
 
        goalRepositoryDB.findAll().observe(goalList -> {
             if (goalList == null) return; // not ready yet, ignore
             isEmpty.setValue(goalList.isEmpty());
+
+            // filter here using label and focus
             goals.setValue(goalList);
            updateGoalsForToday();
            updateGoalsForTomorrow();
            updateGoalsForRecurring();
        });
-        goalRepositoryDB.findAllWeeklyGoals().observe(goalList -> {
-            weeklyGoals.setValue(goalList);
+
+        // ("One Time", "Daily", "Weekly", "Monthly", "Yearly"));
+        frequencies.forEach(freq -> {
+            goalRepositoryDB.findAllFrequencyGoals(freq).observe(goalList -> {
+                if (freq.equals("One Time")) {oneTimeGoals.setValue(goalList);}
+                else if (freq.equals("Daily")) {dailyGoals.setValue(goalList);}
+                else if (freq.equals("Weekly")) {weeklyGoals.setValue(goalList);}
+                else if (freq.equals("Monthly")) {monthlyGoals.setValue(goalList);}
+                else if (freq.equals("Yearly")) {yearlyGoals.setValue(goalList);}
+            });
         });
 
+        // ("Home", "Work", "School", "Errands"));
+        contexts.forEach(context -> {
+            goalRepositoryDB.findAllContextsGoals(context).observe(goalList -> {
+                if (context.equals("Home")) {homeGoals.setValue(goalList);}
+                else if (context.equals("Work")) {workGoals.setValue(goalList);}
+                else if (context.equals("School")) {schoolGoals.setValue(goalList);}
+                else if (context.equals("Errands")) {errandGoals.setValue(goalList);}
+            });
+        });
 
+        // ("Today", "Tomorrow", "Pending", "Recurring"));
+        dropdown.forEach(choice -> {
+            goalRepositoryDB.findAllDropdownGoals(choice).observe(goalList -> {
+                if (choice.equals("Today")) {todayGoals.setValue(goalList);}
+                else if (choice.equals("Tomorrow")) {tomorrowGoals.setValue(goalList);}
+                else if (choice.equals("Pending")) {pendingGoals.setValue(goalList);}
+                else if (choice.equals("Recurring")) {recurringGoals.setValue(goalList);}
+            });
+        });
 
         goals.observe(GoalList -> {
             if (GoalList == null) {
@@ -102,10 +160,9 @@ public class MainViewModel extends ViewModel {
                 recurringGoals.setValue(new ArrayList<>());
             }
         });
-
-
     }
 
+    // getGoals() gets called by GoalListFragment
     public Subject<List<Goal>> getGoals() {
         return goals;
     }
@@ -137,7 +194,6 @@ public class MainViewModel extends ViewModel {
 
     }
 
-
     private void updateIsEmpty() {
         List<Goal> currentGoals = goals.getValue();
         if (currentGoals != null) {
@@ -165,9 +221,6 @@ public class MainViewModel extends ViewModel {
     public Subject<List<Goal>> getGoalsForToday() {
         return todayGoals;
     }
-
-
-
 
     public void setCurrentDate(Date date) {
         this.currentDate = date;
@@ -222,7 +275,6 @@ public class MainViewModel extends ViewModel {
 
         }
     }
-
 
     private void updateGoalsForTomorrow() {
         Calendar calendar = Calendar.getInstance();
@@ -325,6 +377,7 @@ public class MainViewModel extends ViewModel {
                 return filterGoalsByFrequency(goals, frequency);
         }
     }
+
     public void resetRecursiveGoalstoIncomplete () {
         List<Goal> currentGoals = goals.getValue();
         if (currentGoals != null) {
@@ -389,9 +442,39 @@ public class MainViewModel extends ViewModel {
         return nextMonthSameDayOfWeek;
     }
 
+    // Methods below get called from FocusModeFragment
+    // e.g.
+    // User clicks hamburger menu ->
+    // User clicks on a context (e.g. Home) ->
+    // focusHome() method gets called
+    //
+    // NOTE: e.g. the goals marked with "Home" were already pre-loaded
+    // when the app started, we simply have to filter them
+    // depending on the current label.
+    public void focusHome() {
+        MutableSubject<List<Goal>> goalsFiltered = (MutableSubject<List<Goal>>) FilterGoals.filterGoalsFocusToModel(homeGoals, label.getValue());
+        goals.setValue(goalsFiltered.getValue());
+        focus.setValue("Home");
+    }
 
     public Subject<List<Goal>> getGoalsForPending() {
         return pendingGoals;
+    public void focusWork() {
+        MutableSubject<List<Goal>> goalsFiltered = (MutableSubject<List<Goal>>) FilterGoals.filterGoalsFocusToModel(workGoals, label.getValue());
+        goals.setValue(goalsFiltered.getValue());
+        focus.setValue("Work");
+    }
+
+    public void focusSchool() {
+        MutableSubject<List<Goal>> goalsFiltered = (MutableSubject<List<Goal>>) FilterGoals.filterGoalsFocusToModel(schoolGoals, label.getValue());
+        goals.setValue(goalsFiltered.getValue());
+        focus.setValue("School");
+    }
+
+    public void focusErrands() {
+        MutableSubject<List<Goal>> goalsFiltered = (MutableSubject<List<Goal>>) FilterGoals.filterGoalsFocusToModel(errandGoals, label.getValue());
+        goals.setValue(goalsFiltered.getValue());
+        focus.setValue("Errands");
     }
 
     public Subject<List<Goal>> getGoalsForRecurring() {

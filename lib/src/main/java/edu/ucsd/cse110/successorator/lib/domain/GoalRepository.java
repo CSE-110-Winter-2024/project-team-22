@@ -31,4 +31,9 @@ public interface GoalRepository {
 
     LocalDate getDisplayDate (Goal goal);
 
+    Subject<List<Goal>> findAllFrequencyGoals(String freq);
+
+    Subject<List<Goal>> findAllContextsGoals(String context);
+
+    Subject<List<Goal>> findAllDropdownGoals(String choice);
 }

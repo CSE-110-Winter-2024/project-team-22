@@ -71,6 +71,7 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
 
         // Set visibility and text of the context label
         TextView contextLabelTextView = binding.contextLabelText;
+
         if (context != null && !context.isEmpty()) {
             contextLabelTextView.setVisibility(View.VISIBLE);
             switch (context) {
@@ -96,12 +97,15 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
             }
         } else {
             // Hide if no context is set
+            // This will should/never occur
             contextLabelTextView.setVisibility(View.GONE);
         }
 
         if (goal.isCompleted()) {
             // TODO: replace with strikethrough
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            binding.ContextLabelView.setImageResource(R.drawable.done_goal);
+            contextLabelTextView.setText("W");
         } else {
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }

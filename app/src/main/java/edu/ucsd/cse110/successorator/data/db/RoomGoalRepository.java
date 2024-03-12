@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import edu.ucsd.cse110.successorator.lib.domain.SuccessDate;
 import edu.ucsd.cse110.successorator.util.LiveDataSubjectAdapter;
 import edu.ucsd.cse110.successorator.lib.domain.Goal;
 import edu.ucsd.cse110.successorator.lib.domain.GoalRepository;
@@ -71,7 +72,7 @@ public class RoomGoalRepository implements GoalRepository {
     }
 
     @Override
-    public void append(Goal goal){
+    public void append(Goal goal) {
         List<Goal> goalsC = getCompletedOrUncompleted(true);
         List<Goal> goalsU = getCompletedOrUncompleted(false);
 
@@ -140,6 +141,82 @@ public class RoomGoalRepository implements GoalRepository {
         LiveData<List<Goal>> transformedLiveData = Transformations.map(liveData, entities ->
                 entities.stream().map(GoalEntity::toGoal).collect(Collectors.toList()));
         return new LiveDataSubjectAdapter<>(transformedLiveData);
+    }
+
+    public Subject<List<Goal>> findAllFrequencyGoals(String frequency) {
+        LiveData<List<GoalEntity>> liveData = goalDao.findAllFrequencyGoals(frequency);
+        LiveData<List<Goal>> transformedLiveData =
+                    Transformations.map(liveData, entities ->
+                                                    entities.
+                                                    stream().
+                                                    map(GoalEntity::toGoal).
+                                                    collect(Collectors.toList()));
+
+        return new LiveDataSubjectAdapter<>(transformedLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> findAllContextsGoals(String context) {
+        LiveData<List<GoalEntity>> liveData = goalDao.findAllContextGoals(context);
+        LiveData<List<Goal>> transformedLiveData =
+                Transformations.map(liveData, entities ->
+                        entities.
+                                stream().
+                                map(GoalEntity::toGoal).
+                                collect(Collectors.toList()));
+
+        return new LiveDataSubjectAdapter<>(transformedLiveData);
+    }
+
+    @Override
+    public Subject<List<Goal>> findAllDropdownGoals(String choice) {
+        // get all of Todays goals
+        String currDate = SuccessDate.dateToString(SuccessDate.getCurrentDate());
+        LiveData<List<GoalEntity>> liveData1 = goalDao.findAllGoalsAtDate(currDate);
+        LiveData<List<Goal>> transformedLiveData1 =
+                Transformations.map(liveData1, entities ->
+                        entities.
+                                stream().
+                                map(GoalEntity::toGoal).
+                                collect(Collectors.toList()));
+        Subject<List<Goal>> todaysGoals = new LiveDataSubjectAdapter<>(transformedLiveData1);
+
+        // get all of Tomorrows goals
+        String tmwsDate = SuccessDate.dateToString(SuccessDate.getCurrentDate().plusDays(1));
+        LiveData<List<GoalEntity>> liveData2 = goalDao.findAllGoalsAtDate(tmwsDate);
+        LiveData<List<Goal>> transformedLiveData2 =
+                Transformations.map(liveData2, entities ->
+                        entities.
+                                stream().
+                                map(GoalEntity::toGoal).
+                                collect(Collectors.toList()));
+        Subject<List<Goal>> tmwsGoals = new LiveDataSubjectAdapter<>(transformedLiveData2);
+
+        // get all Recurring Goals, sorted by date from oldest down to newest
+
+        // get all Pending Goals
+        String pendingDate = "Pending";
+        LiveData<List<GoalEntity>> liveData4 = goalDao.findAllGoalsAtDate(pendingDate);
+        LiveData<List<Goal>> transformedLiveData4 =
+                Transformations.map(liveData4, entities ->
+                        entities.
+                                stream().
+                                map(GoalEntity::toGoal).
+                                collect(Collectors.toList()));
+        Subject<List<Goal>> pendingGoals = new LiveDataSubjectAdapter<>(transformedLiveData4);
+
+        Subject<List<Goal>> finalData = null;
+        if (choice.equals("Today")) {
+            finalData = todaysGoals;
+        } else if (choice.equals("Tomorrow")) {
+            finalData = tmwsGoals;
+        } else if (choice.equals("Pending")) {
+            finalData = pendingGoals;
+        } else if (choice.equals("Recurring")) {
+            finalData = pendingGoals; // change this soon
+        }
+
+        return finalData;
     }
 
     public LocalDate getDisplayDate (Goal goal){

@@ -135,4 +135,19 @@ public class SimpleGoalRepository implements GoalRepository {
         return goal.getDate();
     }
 
+    @Override
+    public Subject<List<Goal>> findAllFrequencyGoals(String freq) {
+        return null;
+    }
+
+    @Override
+    public Subject<List<Goal>> findAllContextsGoals(String context) {
+        return null;
+    }
+
+    @Override
+    public Subject<List<Goal>> findAllDropdownGoals(String choice) {
+        return null;
+    }
+
 }

@@ -157,7 +157,7 @@ public class CreateGoalDialogFragment extends DialogFragment {
         // US 4
         LocalDate goalDate = null;
 
-        if (goalDateString.equals("Click here to choose a date ...")) {
+        if (goalDateString.equals("Pending")) {
             goalDate = SuccessDate.getCurrentDate();
             // END US4
         } else {

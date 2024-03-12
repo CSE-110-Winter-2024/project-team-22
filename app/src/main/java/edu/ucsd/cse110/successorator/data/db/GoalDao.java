@@ -81,6 +81,34 @@ public interface GoalDao{
     @Query("SELECT * FROM goals WHERE frequency = 'Weekly' AND is_completed = 0")
     LiveData<List<GoalEntity>> findAllUncompletedWeeklyGoals();
 
+    /*
+        Frequency
+     */
+    @Query("SELECT * FROM goals WHERE frequency = :frequency")
+    LiveData<List<GoalEntity>> findAllFrequencyGoals(String frequency);
+
+    @Query("SELECT * FROM goals WHERE frequency = :frequency AND is_completed = 0")
+    LiveData<List<GoalEntity>> findAllUncompletedFreqGoals(String frequency);
+
+    @Query("SELECT * FROM goals WHERE frequency = :frequency AND is_completed = 1")
+    LiveData<List<GoalEntity>> findAllCompletedFreqGoals(String frequency);
+
+    @Query("DELETE FROM goals WHERE frequency = :frequency AND is_completed = 1")
+    void deleteAllCompletedFreqGoals(String frequency);
+
+    /*
+        Context
+     */
+    @Query("SELECT * FROM goals WHERE context = :context")
+    LiveData<List<GoalEntity>> findAllContextGoals(String context);
+
+
+    /*
+        Get goals at a certain date
+        Takes care of Today, Tomorrow and Pending for Dropdown
+     */
+    @Query("SELECT * FROM goals WHERE date = :dateString")
+    LiveData<List<GoalEntity>> findAllGoalsAtDate(String dateString);
 }
 
 

@@ -20,6 +20,7 @@ import java.util.Date;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
 import edu.ucsd.cse110.successorator.ui.expandviews.ExpandViewsFragment;
+import edu.ucsd.cse110.successorator.ui.focusview.FocusModeFragment;
 import edu.ucsd.cse110.successorator.ui.goallist.GoalListFragment;
 import edu.ucsd.cse110.successorator.ui.goallist.dialog.CreateGoalDialogFragment;
 
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 nextDay();
                 displayDate();
-//                removeAllCompleted();
+                // removeAllCompleted();
             }
         });
 
@@ -64,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                 // Goals are present, hide the message
                 textViewMessage.setVisibility(View.GONE);
             }
-
         });
 
         // TODO:
@@ -76,11 +76,9 @@ public class MainActivity extends AppCompatActivity {
                 // update date for Today, Tomorrow, Pending, Recurring
                 if(label.equals("Today")){
                     displayDate();
-                }
-                else if(label.equals("Tomorrow")){
+                } else if (label.equals("Tomorrow")){
                     nextDayOneTime();
-                }
-                else{
+                } else {
                     displayNoDate();
                 }
         });
@@ -98,8 +96,6 @@ public class MainActivity extends AppCompatActivity {
         var itemId = item.getItemId();
 
         if (itemId == R.id.action_bar_add_goal_views) {
-            // change to add button
-            // TODO: make swap button do somnething
             var dialogFragment = CreateGoalDialogFragment.newInstance();
             dialogFragment.show(getSupportFragmentManager(), "CreateDialogFragment");
         }
@@ -108,7 +104,10 @@ public class MainActivity extends AppCompatActivity {
 //            swapFragment();
             var dialogFragment = ExpandViewsFragment.newInstance();
             dialogFragment.show(getSupportFragmentManager(), "ExpandDialogFragment");
+        }
 
+        if (itemId == R.id.action_bar_focus_mode_views){
+            swapFocusFragment();
         }
 
         return super.onOptionsItemSelected(item);
@@ -124,6 +123,21 @@ public class MainActivity extends AppCompatActivity {
             getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container, ExpandViewsFragment.newInstance())
+                    .commit();
+        }
+        isShowingToday = !isShowingToday;
+    }
+
+    private void swapFocusFragment() {
+        if (!isShowingToday){
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, GoalListFragment.newInstance())
+                    .commit();
+        } else {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, FocusModeFragment.newInstance())
                     .commit();
         }
         isShowingToday = !isShowingToday;
@@ -145,20 +159,17 @@ public class MainActivity extends AppCompatActivity {
 
     // display Date in textview
     private void displayDate(){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, M/d");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EE, M/d");
         SimpleDateFormat dayFormat = new SimpleDateFormat("M/d");
         String currentDate = dateFormat.format(date);
         String currentDay = dayFormat.format(date);
         Log.d("===============", date.toString());
         TextView textViewDate = findViewById(R.id.tomorrow_date);
         textViewDate.setText(currentDate);
-
-
-
     }
 
     private void displayNoDate(){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, M/d");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EE, M/d");
         String currentDate = dateFormat.format(date);
         Log.d("===============", date.toString());
 //        TextView textViewDate = findViewById(R.id.text_view_date);
@@ -176,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void displayDate(Date d){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, M/d");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EE, M/d");
         String currentDate = dateFormat.format(d);
         Log.d("===============", date.toString());
 //        TextView textViewDate = findViewById(R.id.text_view_date);
