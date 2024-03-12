@@ -459,6 +459,8 @@ public class MainViewModel extends ViewModel {
 
     public Subject<List<Goal>> getGoalsForPending() {
         return pendingGoals;
+    }
+
     public void focusWork() {
         MutableSubject<List<Goal>> goalsFiltered = (MutableSubject<List<Goal>>) FilterGoals.filterGoalsFocusToModel(workGoals, label.getValue());
         goals.setValue(goalsFiltered.getValue());
