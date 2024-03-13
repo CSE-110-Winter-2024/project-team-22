@@ -68,51 +68,57 @@ public class GoalListAdapter extends ArrayAdapter<Goal> {
 
         // Set visibility and text of the context label
         TextView contextLabelTextView = binding.contextLabelText;
+
         if (context != null && !context.isEmpty()) {
+            // Set context label visibility and text based on the context
             contextLabelTextView.setVisibility(View.VISIBLE);
+            int contextIconId;
+            String contextText;
+
             switch (context) {
                 case "Home":
-                    binding.ContextLabelView.setImageResource(R.drawable.home_button);
-                    contextLabelTextView.setText("H");
+                    contextIconId = goal.isCompleted() ? R.drawable.completed_grey : R.drawable.home_button;
+                    contextText = "H";
                     break;
                 case "School":
-                    binding.ContextLabelView.setImageResource(R.drawable.school_button);
-                    contextLabelTextView.setText("S");
+                    contextIconId = goal.isCompleted() ? R.drawable.completed_grey : R.drawable.school_button;
+                    contextText = "S";
                     break;
                 case "Work":
-                    binding.ContextLabelView.setImageResource(R.drawable.work_button);
-                    contextLabelTextView.setText("W");
+                    contextIconId = goal.isCompleted() ? R.drawable.completed_grey : R.drawable.work_button;
+                    contextText = "W";
                     break;
                 case "Errands":
-                    binding.ContextLabelView.setImageResource(R.drawable.errands_button);
-                    contextLabelTextView.setText("E");
+                    contextIconId = goal.isCompleted() ? R.drawable.completed_grey : R.drawable.errands_button;
+                    contextText = "E";
                     break;
                 default:
                     contextLabelTextView.setVisibility(View.GONE); // Hide if context does not match known types
+                    contextIconId = -1;
+                    contextText = "";
                     break;
             }
+            if (contextIconId != -1) {
+                binding.ContextLabelView.setImageResource(contextIconId);
+            }
+            contextLabelTextView.setText(contextText);
         } else {
             // Hide if no context is set
             contextLabelTextView.setVisibility(View.GONE);
+            binding.ContextLabelView.setVisibility(View.GONE);
         }
 
         if (goal.isCompleted()) {
-            // TODO: replace with strikethrough
+            // Set strike-through text
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
         } else {
             binding.goalText.setPaintFlags(binding.goalText.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
         }
-//
+
         // V -> M
         binding.getRoot().setOnClickListener(v->{
             onGoalClicked.accept(goal);
         });
-
-        //Bind the delete button to the callback.
-        // binding.cardDeleteButton.setOnClickListener(v -> {
-        // onDeleteClicked.accept(goal);
-        //  });
-
 
         return binding.getRoot();
    }

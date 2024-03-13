@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="home">#FDFD96</color>
     <color name="work">#AEC6CF</color>
+    <color name="grey">#A9A9A9</color>
 </resources>
