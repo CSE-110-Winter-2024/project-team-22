@@ -6,7 +6,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,7 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import edu.ucsd.cse110.successorator.databinding.ActivityMainBinding;
-import edu.ucsd.cse110.successorator.ui.expandviews.ExpandViewsFragment;
+import edu.ucsd.cse110.successorator.ui.expandviews.ViewMenuFragment;
 import edu.ucsd.cse110.successorator.ui.expandviews.PendingFragment;
 import edu.ucsd.cse110.successorator.ui.expandviews.RecurringFragment;
 import edu.ucsd.cse110.successorator.ui.expandviews.TomorrowFragment;
@@ -108,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (itemId == R.id.action_bar_expand_more_views){
-//            swapFragment();
-            var dialogFragment = ExpandViewsFragment.newInstance();
-            dialogFragment.show(getSupportFragmentManager(), "ExpandDialogFragment");
+            showViewMenuFragment();
+            /*var dialogFragment = ViewMenuFragment.newInstance();
+            dialogFragment.show(getSupportFragmentManager(), "ExpandDialogFragment");*/
         }
 
         if (itemId == R.id.action_bar_focus_mode_views){
@@ -120,19 +119,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void swapFragment() {
-        if (!isShowingToday){
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, GoalListFragment.newInstance())
-                    .commit();
-        } else {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, ExpandViewsFragment.newInstance())
-                    .commit();
-        }
-        isShowingToday = !isShowingToday;
+    private void showViewMenuFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, ViewMenuFragment.newInstance())
+                .commit();
     }
 
     public void swapFocusFragment() {
