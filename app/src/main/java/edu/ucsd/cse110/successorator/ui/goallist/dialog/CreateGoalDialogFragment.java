@@ -93,33 +93,33 @@ public class CreateGoalDialogFragment extends DialogFragment {
         int selectedHomeBtn = R.drawable.home_selected_button;
         view.homeButton.setBackgroundResource(selectedHomeBtn);
         RadioButton weeklyButton = view.weeklyButton;
-        //weeklyButton.setText("weekly on " + activityModel.getDateOtherFormat().substring(0,4));
-        weeklyButton.setText("Weekly");
+        weeklyButton.setText("weekly on " + activityModel.getDateOtherFormat().substring(0,4));
+//        weeklyButton.setText("Weekly");
         RadioButton yearlyButton = view.yearlyButton;
-        //yearlyButton.setText("yearly on "+ activityModel.getDateOtherFormat().substring(4,8));
-        yearlyButton.setText("Yearly");
+        yearlyButton.setText("yearly on "+ activityModel.getDateOtherFormat().substring(4,8));
+//        yearlyButton.setText("Yearly");
         RadioButton monthlyButton = view.monthlyButton;
-        // String day = activityModel.getDateOtherFormat().substring(8,10);
-        //day = day.trim();
-        //int int_day = Integer.parseInt(day);
-        //int x = (int_day+6)/7;
-        //String temp;
-        //if (x==1){
-        //    temp = "st ";
-        //}
-        //else if (x==2){
-        //    temp = "nd ";
-        //}
-        //else if(x==3){
-        //    temp = "rd ";
-        //}
-        //else{
-        //    temp = "th ";
-        //}
+         String day = activityModel.getDateOtherFormat().substring(6,8);
+        day = day.trim();
+        int int_day = Integer.parseInt(day);
+        int x = (int_day+6)/7;
+        String temp;
+        if (x==1){
+            temp = "st ";
+        }
+        else if (x==2){
+            temp = "nd ";
+        }
+        else if(x==3){
+            temp = "rd ";
+        }
+        else{
+            temp = "th ";
+        }
 
-        //String X = String.valueOf(x);
-        //monthlyButton.setText("monthly on "+X+temp+activityModel.getDateOtherFormat().substring(0,4));
-        monthlyButton.setText("Monthly");
+        String X = String.valueOf(x);
+        monthlyButton.setText("monthly on "+X+temp+activityModel.getDateOtherFormat().substring(0,4));
+//        monthlyButton.setText("Monthly");
         return builder.create();
     }
 
