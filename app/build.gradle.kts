@@ -37,7 +37,10 @@ android {
 }
 
 dependencies {
-    project(":lib")
+    implementation("androidx.room:room-common:2.6.1")
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation(project(":lib"))
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
 
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
